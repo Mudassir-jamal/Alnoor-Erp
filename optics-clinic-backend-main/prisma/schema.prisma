@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  email String @unique
+  hash  String
+
+  firstName String?
+  lastName  String?
+
+  @@map("users")
+}
+
+// Define the `customer` model
+model Customer {
+  id           Int       @id @default(autoincrement())
+  name         String
+  phone_number String    @unique
+  orders       Order[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime? @updatedAt
+}
+
+// Define the `product` model
+model Product {
+  id         Int       @id @default(autoincrement())
+  name       String
+  quantity   Int
+  price      Int
+  orders     Order[]
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+}
+
+// Define the `frame` model
+model Frame {
+  id         Int       @id @default(autoincrement())
+  name       String
+  price      Int
+  glasses    Glasses[]
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+}
+
+// Define the `lens` model
+model Lens {
+  id         Int       @id @default(autoincrement())
+  name       String
+  price      Int
+  glasses    Glasses[]
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+}
+
+// Define the `glasses` model
+model Glasses {
+  id             Int       @id @default(autoincrement())
+  frame          Frame     @relation(fields: [frame_id], references: [id])
+  frame_id       Int
+  lens           Lens      @relation(fields: [lens_id], references: [id])
+  lens_id        Int
+  left_eye_sph   Float
+  left_eye_cyl   Float
+  left_eye_axis  Int
+  right_eye_sph  Float
+  right_eye_cyl  Float
+  right_eye_axis Int
+  price          Int
+  orders         Order[]
+  created_at     DateTime  @default(now())
+  updated_at     DateTime? @updatedAt
+}
+
+// Define the `order` model
+model Order {
+  id            Int       @id @default(autoincrement())
+  customer      Customer  @relation(fields: [customer_id], references: [id])
+  customer_id   Int
+  product       Product   @relation(fields: [product_id], references: [id])
+  product_id    Int
+  glasses       Glasses?  @relation(fields: [glasses_id], references: [id])
+  glasses_id    Int?
+  quantity      Int
+  amount        Int
+  order_date    DateTime
+  delivery_date DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime? @updatedAt
+}
